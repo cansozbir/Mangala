@@ -12,19 +12,6 @@ public class Game {
     String winner ="non";
     boolean sira ;
 
-    public Game ( ) {   /// initialize
-        for (int i = 0; i < 6; i++) {
-            row1[i] = new Pit ( );
-            row2[i] = new Pit ( );
-        }
-        this.sira = ilk ();
-        System.out.println ("\t\t\tOYUN BASLADI" );
-        if (sira)
-            System.out.println ("Oyuna Player1 baslayacak..." );
-        else
-            System.out.println ("Oyuna Player2 baslayacak..." );
-    }
-
     public boolean ilk ( ) {
         Random r = new Random ( );
         int x = r.nextInt (2);
@@ -34,29 +21,49 @@ public class Game {
             return false; //"Player2";
     }
 
+    public String siraKimde (boolean sira) {
+        if (sira)
+            return "Player1";
+        else
+            return "Player2";
+    }
+
+    public Game ( ) {   /// initialize
+        for (int i = 0; i < 6; i++) {
+            row1[i] = new Pit ( );
+            row2[i] = new Pit ( );
+        }
+        this.sira = ilk ();
+        System.out.println ("\t\t\tOYUN BASLADI" );
+
+        System.out.println ("Oyuna "+ siraKimde(sira)+ " baslayacak..." );
+    }
+
     public void Hamle ( ) {
-        Pit [] rowa;
-        Pit [] rowb;
-        Pit t;
+        Pit [] rowa; // o an sira sahibi oyuncunun kendi kuyularini temsil ediyor
+        Pit [] rowb; // o an sira sahibi oyuncunun rakip kuyularini temsil ediyor
+        Pit t; //       o an sira sahibi oyuncunun hazine kuyusunu temsil ediyor
+        Pit t_enemy ;// o anda rakip oyuncunun hazine kuyusunu temsil ediyor
         if (this.sira) {
             rowa = this.row1;
             rowb = this.row2;
             t = this.t1;
-            System.out.print("\nPlayer1 " );
+            t_enemy = this.t2;
         }
         else {
             rowa = this.row2;
             rowb = this.row1;
             t = this.t2;
-            System.out.print("\nPlayer2 " );
+            t_enemy = this.t1;
         }
+        System.out.println(siraKimde(sira));
         int index;
         do {
             System.out.print ("hamle giriniz : ");
             index = inp.nextInt ( ) - 1;
-            if ( index < 0 || index >5 )
+            if (( index < 0 || index >5 ) || rowa[index].getStone()==0 )
                 System.out.println ("Gecersiz hamle.." );
-        }while ( index < 0 || index >5 );
+        }while (( index < 0 || index >5 ) || rowa[index].getStone()==0 );
         int stonesInIndex = rowa[index].getStone ( );
         int iter = index;
         rowa[index].setStone (0);
@@ -66,11 +73,11 @@ public class Game {
             if (iter<5) {
                 rowa[iter+1].setStone (rowa[iter+1].getStone () +1);
             }
-            else if (iter==5) {
+            else { // if iter ==  5
                 t.setStone (t.getStone ( ) + 1);
             }
             this.sonhamle = iter;
-            status (rowa,rowb,t);
+            status (rowa,rowb,t,t_enemy);
         }
         else {
             while ( stonesInIndex > 0 ) {
@@ -79,7 +86,7 @@ public class Game {
                     rowa[iter].setStone (rowa[iter].getStone ( ) + 1);
                     iter++;
                     stonesInIndex--;
-                } else if ( iter == 6 ) {   // bu kisimda hazinesine biraktigi icin sira degisimi olmayacak
+                } else if ( iter == 6 ) {
                     t.setStone (t.getStone ( ) + 1);
                     iter++;
                     stonesInIndex--;
@@ -89,14 +96,14 @@ public class Game {
                     iter++;
                     stonesInIndex--;
                 } else {
-                    iter = 0;
+                    iter = iter-13;
                 }
             }
-            status (rowa,rowb,t);
+            status (rowa,rowb,t,t_enemy);
         }
     }
 
-    public void status (Pit [] rowa , Pit[] rowb , Pit t) {
+    public void status (Pit [] rowa , Pit[] rowb , Pit t, Pit t_enemy) {
 
         if (this.sonhamle != 6) {
             if (this.sonhamle < 6) {
@@ -114,39 +121,28 @@ public class Game {
                 }
 
             }
-            if (!kazanan ())
+            if (!kazanan (rowa, t, t_enemy ))
                 this.sira = !this.sira;
 
         }
 
     }
 
-
-    public boolean kazanan () {
-        Pit [] row ;
-        boolean bool = true;
-        if (this.sira)
-            row = row1;
-        else
-            row = row2;
+    public  boolean kazanan (Pit [] row , Pit my_treasury , Pit enemy_treasury) {
+        boolean isGameFinished = true ;
         for (Pit each : row) {
             if (each.getStone () != 0)
-                bool=false;
+                isGameFinished=false;
+        }
+        if (isGameFinished) {
+            this.winner = siraKimde(sira);
+            my_treasury.setStone(my_treasury.getStone() + enemy_treasury.getStone());
+            enemy_treasury.setStone(0);
+            playable = false;
         }
 
-        if (bool && this.sira) {
-            this.winner = "Player1";
-            this.playable = false;
-            return true;
-        }
-        else if (bool) {
-            this.winner = "Player2";
-            this.playable = false;
-            return true;
-        }
-        return false;
+        return isGameFinished;
     }
-
 
     public void tahtayiYaz () {
 
@@ -166,11 +162,12 @@ public class Game {
     }
 
     public void gameLoop () {
-        while ( !kazanan() ) {
+        while ( playable ) {
             tahtayiYaz ( );
             Hamle ( );
 
         }
+
         tahtayiYaz ( );
         System.out.println (winner + " KAZANDI \\o/" );
     }
