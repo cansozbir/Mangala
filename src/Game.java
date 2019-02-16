@@ -1,3 +1,4 @@
+import java.util.InputMismatchException;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -5,12 +6,12 @@ public class Game {
     Scanner inp = new Scanner (System.in);
     Pit[] row1 = new Pit[6];
     Pit[] row2 = new Pit[6];
-    int sonhamle;
+    int sonhamle;  // son birakilan tasin hangi indexe birakildigini tutuyor
     Pit t1 = new Pit (0);
     Pit t2 = new Pit (0);
     boolean playable = true;
     String winner ="non";
-    boolean sira ;
+    boolean sira ;  //
 
     public boolean ilk ( ) {
         Random r = new Random ( );
@@ -39,44 +40,52 @@ public class Game {
         System.out.println ("Oyuna "+ siraKimde(sira)+ " baslayacak..." );
     }
 
+
     public void Hamle ( ) {
         Pit [] rowa; // o an sira sahibi oyuncunun kendi kuyularini temsil ediyor
         Pit [] rowb; // o an sira sahibi oyuncunun rakip kuyularini temsil ediyor
-        Pit t; //       o an sira sahibi oyuncunun hazine kuyusunu temsil ediyor
+        Pit t;       // o an sira sahibi oyuncunun hazine kuyusunu temsil ediyor
         Pit t_enemy ;// o anda rakip oyuncunun hazine kuyusunu temsil ediyor
-        if (this.sira) {
+
+        if (this.sira) {  // sira player1 icin
             rowa = this.row1;
             rowb = this.row2;
             t = this.t1;
             t_enemy = this.t2;
         }
-        else {
+        else {           // sira player2 icin
             rowa = this.row2;
             rowb = this.row1;
             t = this.t2;
             t_enemy = this.t1;
         }
-        System.out.println(siraKimde(sira));
+
         int index;
+
         do {
-            System.out.print ("hamle giriniz : ");
-            index = inp.nextInt ( ) - 1;
+
+            System.out.print (siraKimde(sira) +" hamle giriniz : ");
+                index = inp.nextInt() - 1;
+
             if (( index < 0 || index >5 ) || rowa[index].getStone()==0 )
                 System.out.println ("Gecersiz hamle.." );
         }while (( index < 0 || index >5 ) || rowa[index].getStone()==0 );
+
         int stonesInIndex = rowa[index].getStone ( );
+
         int iter = index;
+
         rowa[index].setStone (0);
 
-        if (stonesInIndex==1) {
+        if (stonesInIndex==1) {  // eger secilen kuyuda tek bir tas var ise (istisna)
             rowa[iter].setStone (0);
             if (iter<5) {
                 rowa[iter+1].setStone (rowa[iter+1].getStone () +1);
             }
-            else { // if iter ==  5
+            else { //
                 t.setStone (t.getStone ( ) + 1);
             }
-            this.sonhamle = iter;
+            this.sonhamle = iter+1;
             status (rowa,rowb,t,t_enemy);
         }
         else {
@@ -95,7 +104,7 @@ public class Game {
                     rowb[iter - 7].setStone (rowb[iter - 7].getStone ( ) + 1);
                     iter++;
                     stonesInIndex--;
-                } else {
+                } else {  //skip enemy treasury
                     iter = iter-13;
                 }
             }
@@ -104,21 +113,22 @@ public class Game {
     }
 
     public void status (Pit [] rowa , Pit[] rowb , Pit t, Pit t_enemy) {
-
         if (this.sonhamle != 6) {
+
             if (this.sonhamle < 6) {
+
                 if (rowa[this.sonhamle].getStone () == 1 && rowb[5-this.sonhamle].getStone () > 0 ) {
                     t.setStone (t.getStone ()+rowa[this.sonhamle].getStone () + rowb[5-this.sonhamle].getStone ());
                     rowa[this.sonhamle].setStone (0);
                     rowb[5-this.sonhamle].setStone (0);
                 }
-
             }
             else {
                 if (rowb[this.sonhamle-7].getStone ()%2 == 0) {
                     t.setStone (t.getStone () + rowb[this.sonhamle-7].getStone ());
                     rowb[this.sonhamle-7].setStone (0);
                 }
+
 
             }
             if (!kazanan (rowa, t, t_enemy ))
