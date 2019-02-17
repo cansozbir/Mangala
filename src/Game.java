@@ -10,7 +10,7 @@ public class Game {
     Pit t1 = new Pit (0);
     Pit t2 = new Pit (0);
     boolean playable = true;
-    String winner ="non";
+    String winner ="none";
     boolean sira ;  //
 
     public boolean ilk ( ) {
@@ -85,7 +85,7 @@ public class Game {
             else { //
                 t.setStone (t.getStone ( ) + 1);
             }
-            this.sonhamle = iter+1;
+            this.sonhamle = iter + 1;
             status (rowa,rowb,t,t_enemy);
         }
         else {
@@ -107,44 +107,43 @@ public class Game {
                 } else {  //skip enemy treasury
                     iter = iter-13;
                 }
+
             }
+
             status (rowa,rowb,t,t_enemy);
         }
     }
 
     public void status (Pit [] rowa , Pit[] rowb , Pit t, Pit t_enemy) {
-        if (this.sonhamle != 6) {
-
-            if (this.sonhamle < 6) {
-
-                if (rowa[this.sonhamle].getStone () == 1 && rowb[5-this.sonhamle].getStone () > 0 ) {
-                    t.setStone (t.getStone ()+rowa[this.sonhamle].getStone () + rowb[5-this.sonhamle].getStone ());
-                    rowa[this.sonhamle].setStone (0);
-                    rowb[5-this.sonhamle].setStone (0);
-                }
+        if (this.sonhamle < 6) {
+            if (rowa[this.sonhamle].getStone () == 1 && rowb[5-this.sonhamle].getStone () > 0 ) {
+                t.setStone (t.getStone ()+rowa[this.sonhamle].getStone () + rowb[5-this.sonhamle].getStone ());
+                rowa[this.sonhamle].setStone (0);
+                rowb[5-this.sonhamle].setStone (0);
             }
-            else {
-                if (rowb[this.sonhamle-7].getStone ()%2 == 0) {
-                    t.setStone (t.getStone () + rowb[this.sonhamle-7].getStone ());
-                    rowb[this.sonhamle-7].setStone (0);
-                }
-
-
-            }
-            if (!kazanan (rowa, t, t_enemy ))
-                this.sira = !this.sira;
-
         }
-
+        else if (this.sonhamle > 6){
+            if (rowb[this.sonhamle-7].getStone ()%2 == 0) {
+                t.setStone (t.getStone () + rowb[this.sonhamle-7].getStone ());
+                rowb[this.sonhamle-7].setStone (0);
+            }
+        }
+        if (!kazanan(rowa ,t ,t_enemy)) {
+            if (sonhamle != 6)
+                sira = !sira ;
+        }
     }
+
 
     public  boolean kazanan (Pit [] row , Pit my_treasury , Pit enemy_treasury) {
         boolean isGameFinished = true ;
+
         for (Pit each : row) {
             if (each.getStone () != 0)
                 isGameFinished=false;
         }
         if (isGameFinished) {
+            System.out.println("xdxdxd");
             this.winner = siraKimde(sira);
             my_treasury.setStone(my_treasury.getStone() + enemy_treasury.getStone());
             enemy_treasury.setStone(0);
@@ -154,14 +153,14 @@ public class Game {
         return isGameFinished;
     }
 
-    public void tahtayiYaz () {
+    public void drawBoard () {
 
         System.out.print ("      " );
         for (int i=5 ; i>=0 ; i--) {
             System.out.print ("["+ row2[i].getStone ()+"] " );
         }
 
-        System.out.println ("\n[" +t2.getStone () + "]\t\t\t\t\t\t\t\t[" +t1.getStone () + "]");
+        System.out.println ("\n[" +t2.getStone () + "]                             [" +t1.getStone () + "]");
 
         System.out.print ("      " );
 
@@ -173,12 +172,11 @@ public class Game {
 
     public void gameLoop () {
         while ( playable ) {
-            tahtayiYaz ( );
+            drawBoard ( );
             Hamle ( );
-
         }
 
-        tahtayiYaz ( );
+        drawBoard( );
         System.out.println (winner + " KAZANDI \\o/" );
     }
 
