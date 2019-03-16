@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Mangala:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Mangala_jar</output-path>
+    <root id="archive" name="Mangala.jar">
+      <element id="module-output" name="Mangala" />
+    </root>
+  </artifact>
+</component>
