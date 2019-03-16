@@ -143,7 +143,6 @@ public class Game {
                 isGameFinished=false;
         }
         if (isGameFinished) {
-            System.out.println("xdxdxd");
             this.winner = siraKimde(sira);
             my_treasury.setStone(my_treasury.getStone() + enemy_treasury.getStone());
             enemy_treasury.setStone(0);
